@@ -30,6 +30,7 @@ app.get("/api/persons", (req, res) => {
   res.send(persons);
 });
 
+// show info about the persons list
 app.get("/info", (req, res) => {
   const currentDate = new Date();
   const currentTime = currentDate.toTimeString();
@@ -42,6 +43,19 @@ app.get("/info", (req, res) => {
 
   res.send(info)
 });
+
+// fetch the specified data
+app.get('/api/persons/:id', (req, res) =>{
+  const id = Number(req.params.id)
+  const person = persons.find(p => p.id === id)
+
+  if(person) {
+    res.json(person)
+  } else {
+    res.status(404).end()
+  }
+  res.send
+})
 
 //start the server
 const PORT = 5001;

@@ -5,7 +5,10 @@ const app = express();
 // middleware to parse JSON bodies
 app.use(express.json());
 
-// set up morgan middleware to log http requests
+// Define a custom format
+const customFormat = ':method :url :status :response-time ms - :res[content-length] :reqBody';
+
+// Set up Morgan middleware with custom format
 app.use(morgan('dev'))
 
 // user data list

@@ -1,8 +1,12 @@
 const express = require("express");
+const morgan = require('morgan')
 const app = express();
 
 // middleware to parse JSON bodies
 app.use(express.json());
+
+// set up morgan middleware to log http requests
+app.use(morgan('dev'))
 
 // user data list
 let persons = [

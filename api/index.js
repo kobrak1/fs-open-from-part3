@@ -54,7 +54,19 @@ app.get('/api/persons/:id', (req, res) =>{
   } else {
     res.status(404).end()
   }
-  res.send
+})
+
+// delete the specified data
+app.delete('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const newPersons = persons.filter(p => p.id !== id)
+
+  if(newPersons === persons) {
+    return res.status(404).send(`There is no any person with the specified id: ${id}`)
+  } else {
+    res.json(newPersons)
+  }
+  res.status(204).end()
 })
 
 //start the server

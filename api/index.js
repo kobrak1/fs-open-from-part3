@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
 
+// middleware to parse JSON bodies
+app.use(express.json());
+
 // user data list
-const persons = [
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -41,33 +44,60 @@ app.get("/info", (req, res) => {
   <p> ${currentTime} </p>
   `;
 
-  res.send(info)
+  res.send(info);
 });
 
 // fetch the specified data
-app.get('/api/persons/:id', (req, res) =>{
-  const id = Number(req.params.id)
-  const person = persons.find(p => p.id === id)
+app.get("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const person = persons.find((p) => p.id === id);
 
-  if(person) {
-    res.json(person)
+  if (person) {
+    res.json(person);
   } else {
-    res.status(404).end()
+    res.status(404).end();
   }
-})
+});
 
 // delete the specified data
-app.delete('/api/persons/:id', (req, res) => {
+app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
-  const newPersons = persons.filter(p => p.id !== id)
+  const newPersons = persons.filter((p) => p.id !== id);
 
-  if(newPersons === persons) {
-    return res.status(404).send(`There is no any person with the specified id: ${id}`)
+  if (newPersons === persons) {
+    return res
+      .status(404)
+      .send(`There is no any person with the specified id: ${id}`);
   } else {
-    res.json(newPersons)
+    res.json(newPersons);
   }
-  res.status(204).end()
-})
+  res.status(204).end();
+});
+
+// post a new person
+const generateId = () => {
+  const maxId = persons.length > 0 ? Math.max(...persons.map((p) => p.id)) : 0;
+  return maxId + 1;
+};
+
+// post a new person
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+  if (!body.name || !body.number) {
+    return res.status(400).json({
+      error: "Name or number is missing",
+    });
+  }
+
+  const personInfo = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  };
+
+  persons = [...persons, personInfo];
+  res.json(personInfo);
+});
 
 //start the server
 const PORT = 5001;

@@ -1,6 +1,6 @@
 const express = require("express");
-const morgan = require('morgan')
 const app = express();
+const morgan = require('morgan')
 
 // middleware to parse JSON bodies
 app.use(express.json());

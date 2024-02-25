@@ -4,12 +4,12 @@
   "description": "api",
   "main": "index.js",
   "scripts": {
+    "build:ui": "rm -rf dist && cd ../ && npm run build && cp -r dist ../api",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "build": "npm i",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "build": "npm i",
-    "build:ui": "rm -rf dist && cd ../ && npm run build && cp -r dist ../api",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",

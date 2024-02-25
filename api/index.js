@@ -5,11 +5,11 @@ const app = express();
 // middleware to parse JSON bodies
 app.use(express.json());
 
-// Define a custom format
-const customFormat = ':method :url :status :response-time ms - :res[content-length] :reqBody';
-
-// Set up Morgan middleware with custom format
+// Set up Morgan middleware to log requests
 app.use(morgan('dev'))
+
+// middleware to vies static files on backend
+app.use(express.static('build'));
 
 // user data list
 let persons = [

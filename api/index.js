@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(morgan('dev'))
 
 // middleware to vies static files on backend
-app.use(express.static('build'));
+app.use(express.static('dist'));
 
 // user data list
 let persons = [

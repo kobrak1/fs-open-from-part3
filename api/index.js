@@ -1,9 +1,17 @@
+require("dotenv").config();
 const express = require("express");
+const morgan = require('morgan');
+const cors = require('cors');
+const Person = require('./models/person')
+
+// assign express() to the variable called 'app'
 const app = express();
-const morgan = require('morgan')
 
 // middleware to parse JSON bodies
 app.use(express.json());
+
+// middleware to assure same origin policy
+app.use(cors());
 
 // Set up Morgan middleware to log requests
 app.use(morgan('dev'))
@@ -11,40 +19,18 @@ app.use(morgan('dev'))
 // middleware to vies static files on backend
 app.use(express.static('dist-api'));
 
-// user data list
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 // route to handle get requests to /api/persons
 app.get("/api/persons", (req, res) => {
-  res.send(persons);
+  Person.find({}).then(result => {
+    res.json(result)
+  })
 });
 
 // show info about the persons list
 app.get("/info", (req, res) => {
   const currentDate = new Date();
   const currentTime = currentDate.toTimeString();
-  const userCount = persons.length;
+  const userCount = Person.length;
 
   const info = `
   <p>Phonebook has info for ${userCount} people</p> <br />
@@ -57,7 +43,7 @@ app.get("/info", (req, res) => {
 // fetch the specified data
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
-  const person = persons.find((p) => p.id === id);
+  const person = Person.find((p) => p.id === id);
 
   if (person) {
     res.json(person);
@@ -69,9 +55,9 @@ app.get("/api/persons/:id", (req, res) => {
 // delete the specified data
 app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
-  const newPersons = persons.filter((p) => p.id !== id);
+  const newPersons = Person.filter((p) => p.id !== id);
 
-  if (newPersons === persons) {
+  if (newPersons === Person) {
     return res
       .status(404)
       .send(`There is no any person with the specified id: ${id}`);
@@ -90,7 +76,7 @@ const generateId = () => {
 // post a new person
 app.post("/api/persons", (req, res) => {
   const body = req.body;
-  const nameCheck = persons.find(p => p.name === body.name)
+  const nameCheck = Person.find(p => p.name === body.name)
 
   if (!body.name || !body.number) {
     return res.status(400).json({
@@ -102,17 +88,17 @@ app.post("/api/persons", (req, res) => {
     })
   }
 
-  const personInfo = {
-    id: generateId(),
+  const personInfo = new Person({
     name: body.name,
-    number: body.number,
-  };
+    number: body.number
+  })
 
-  persons = [...persons, personInfo];
-  res.json(personInfo);
+  personInfo.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
 });
 
 //start the server
-const PORT = 5001;
+const PORT = process.env.PORT;
 app.listen(PORT);
 console.log(`server is running on port ${PORT}`);

@@ -10,7 +10,7 @@ const getAll = () => {
     })
 }
 
-const create = newObject => {
+const create = (newObject) => {
   return axios.post(baseUrl, newObject)
   .catch(() => {
     console.log('fail')

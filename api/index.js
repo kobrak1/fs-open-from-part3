@@ -32,14 +32,14 @@ app.get("/info", (req, res) => {
 
 // fetch the specified data
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = Person.find((p) => p.id === id);
-
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
+  Person.findById(req.params.id)
+    .then(person => person 
+                    ? res.json(person) 
+                    : res.status(404).end())
+    .catch(error => {
+      console.log('Error:', error)
+      res.status(500).json({ error: "Requested person not found" }).end()
+    })
 });
 
 // DELETE the specified data

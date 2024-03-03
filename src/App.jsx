@@ -1,86 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import PersonsService from "./services/PersonsService";
+import PersonForm from "./components/PersonForm";
+import Filter from "./components/Filter";
+import Notification from "./components/Notification"
+import Persons from "./components/Persons"
 import "./index.css";
 
-// this component displays saved persons
-const Persons = ({ persons, filtered, removePerson }) => {
-  const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(filtered.toLowerCase())
-  );
-  return (
-    <ul style={{ listStyleType: "none" }}>
-      {filteredPersons.map((e) => (
-        <li key={e.id}>
-          {e.name} {e.number}
-          <button onClick={() => removePerson(e.id)}>Delete</button>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-// filter component
-const Filter = ({ filtered, setFiltered }) => {
-  return (
-    <div>
-      Filter by name:
-      <input
-        type="text"
-        value={filtered}
-        onChange={(e) => setFiltered(e.target.value)}
-        placeholder="Search..."
-      />
-    </div>
-  );
-};
-
-// form Component
-const PersonForm = ({
-  addUser,
-  newName,
-  setNewName,
-  newNumber,
-  setNewNumber,
-}) => {
-  return (
-    <form onSubmit={addUser}>
-      <div>
-        Name:{" "}
-        <input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        Number:{" "}
-        <input
-          type="tel"
-          value={newNumber}
-          onChange={(e) => setNewNumber(e.target.value)}
-          minLength={4}
-          maxLength={15}
-          required
-        />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  );
-};
-// error message component
-const Notification = ({ errorMessage, successMessage }) => {
-  if (errorMessage) {
-    return <div className="error">{errorMessage}</div>;
-  } else if (successMessage) {
-    return <div className="success">{successMessage}</div>;
-  } else {
-    return null;
-  }
-};
 
 const App = () => {
   // state hooks
@@ -102,30 +28,54 @@ const App = () => {
 
 
 
-  // POST and UPDATE a new person
+  // POST a new person
+  const addPerson = (newObject) => {
+    PersonsService.create(newObject)        
+    .then(() => PersonsService.getAll())
+    .then((response) => {
+      setPersons(response.data) // set the updated state
+      console.log('person saved');
+      // clear the input fields
+      setNewName("")
+      setNewNumber("")
+    })
+    .catch((error) => {
+      console.log("Error while adding the new pereson:", error);
+    })
+  }
+  
+  // UPDATE a person
+  const updatePerson = (id, newObject) => {
+    PersonsService.update(id, newObject)
+      .then(() => PersonsService.getAll())
+      .then(response => {
+        setPersons(response.data) // set the updated state
+        console.log('person updated')
+        // clear the input fields
+        setNewName("")
+        setNewNumber("")
+      })
+      .catch(error => {
+        console.log("Error while updating the person:", error)
+      })
+  }
+
+  // handle the process of adding and updating contacts
   const addUser = (e) => {
     e.preventDefault();
     console.log("button is clicked", e.target);
 
-    const newObject = {
+    const newPerson = {
       name: newName,
       number: newNumber,
     };
-    console.log(newObject.name, newObject.number);
-    // POST request with axios from PersonsService
-    PersonsService.create(newObject)
-      .then(() => PersonsService.getAll())
-      .then((response) => {
-        // set the updated state
-        setPersons(response.data)
-        console.log('person saved!!!!');
-        // clear the input fields
-        setNewName("");
-        setNewNumber("");
-      })
-      .catch((error) => {
-        console.log("Error while adding the new pereson:", error);
-      });
+
+    // check if the person exist
+    const PersonExist = persons.find(p => p.name === newName)
+    const isPersonExist = Boolean(PersonExist)
+    isPersonExist
+      ? updatePerson(PersonExist.id, newPerson)
+      : addPerson(newPerson)
   };
 
 
@@ -159,9 +109,7 @@ const App = () => {
         });
     }
   };
-
-
-
+  
   return (
     <div>
       <h1>Phonebook</h1>

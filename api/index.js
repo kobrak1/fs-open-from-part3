@@ -43,17 +43,14 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 // DELETE the specified data
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-
-  Person.findByIdAndDelete(id, (err, docs) => {
-    if (err) {
-      console.log("Error:", err);
-    } else {
-      console.log("Deleted:", docs);
-    }
-  });
-});
+app.delete('/api/persons/:id', (req, res) => {
+  Person.findByIdAndDelete(req.params.id)
+    // eslint-disable-next-line no-unused-vars
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
+})
 
 // POST a new person
 app.post("/api/persons", (req, res) => {
@@ -68,6 +65,23 @@ app.post("/api/persons", (req, res) => {
     res.json(savedPerson);
   });
 });
+
+// ERROR HANDLERS
+const unknownEndPoint = (req, res) => {
+  res.status(404).end()
+}
+app.use(unknownEndPoint) // handler of requests with unknown endpoint
+
+const errorHandler = (error, req, res, next) => {
+  console.error('Error:', error.message)
+
+  if (error.name === 'CastError') {
+    res.status(404).send({error: "malformatted id"})
+  }
+
+  next(error)
+}
+app.use(errorHandler) //handler of requests with unknown id
 
 //start the server
 const PORT = process.env.PORT;

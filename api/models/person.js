@@ -20,7 +20,11 @@ const personSchema = new mongoose.Schema({
       minLength: 3,
       required: true
     },
-    number: Number
+    number: {
+      type: Number,
+      minLength: 8,
+      required: true
+    }
 })
 
 // delete the returned _id and __v values from mongoDB

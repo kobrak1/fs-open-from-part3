@@ -31,16 +31,18 @@ const App = () => {
   // POST a new person
   const addPerson = (newObject) => {
     PersonsService.create(newObject)        
-    .then(() => PersonsService.getAll())
+    .then((response) => response && PersonsService.getAll())
     .then((response) => {
       setPersons(response.data) // set the updated state
-      console.log('person saved');
+      console.log('person saved', response);
       // clear the input fields
       setNewName("")
       setNewNumber("")
     })
     .catch((error) => {
-      console.log("Error while adding the new pereson:", error);
+      console.log("Error while posting:", error.message);
+      setErrorMessage(`Error: ${error.message}`)
+      setTimeout(() => setErrorMessage(null), 3000)
     })
   }
   
@@ -56,12 +58,14 @@ const App = () => {
         setNewNumber("")
       })
       .catch(error => {
-        console.log("Error while updating the person:", error)
+        console.log("Error while updating:", error.message)
+        setErrorMessage(`Error: ${error.message}`)
+        setTimeout(() => setErrorMessage(null), 3000)
       })
   }
 
   // handle the process of adding and updating contacts
-  const addUser = (e) => {
+  const handlePerson = (e) => {
     e.preventDefault();
     console.log("button is clicked", e.target);
 
@@ -120,7 +124,7 @@ const App = () => {
         successMessage={successMessage}
       />
       <PersonForm
-        addUser={addUser}
+        handlePerson={handlePerson}
         newName={newName}
         setNewName={setNewName}
         newNumber={newNumber}

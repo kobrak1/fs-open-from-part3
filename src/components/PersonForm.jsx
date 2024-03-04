@@ -1,12 +1,12 @@
 const PersonForm = ({
-    addUser,
+    handlePerson,
     newName,
     setNewName,
     newNumber,
     setNewNumber,
   }) => {
     return (
-      <form onSubmit={addUser}>
+      <form onSubmit={handlePerson}>
         <div>
           Name:{" "}
           <input

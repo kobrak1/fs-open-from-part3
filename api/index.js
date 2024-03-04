@@ -33,43 +33,40 @@ app.get("/info", (req, res) => {
 // fetch the specified data
 app.get("/api/persons/:id", (req, res) => {
   Person.findById(req.params.id)
-    .then(person => person 
-                    ? res.json(person) 
-                    : res.status(404).end())
-    .catch(error => {
-      console.log('Error:', error)
-      res.status(500).json({ error: "Requested person not found" }).end()
-    })
+    .then((person) => (person ? res.json(person) : res.status(404).end()))
+    .catch((error) => {
+      console.log("Error:", error);
+      res.status(500).json({ error: "Requested person not found" }).end();
+    });
 });
 
 // DELETE the specified data
-app.delete('/api/persons/:id', (req, res) => {
+app.delete("/api/persons/:id", (req, res) => {
   Person.findByIdAndDelete(req.params.id)
     // eslint-disable-next-line no-unused-vars
-    .then(result => {
-      res.status(204).end()
+    .then((result) => {
+      res.status(204).end();
     })
-    .catch(error => next(error))
-})
+    .catch((error) => next(error));
+});
 
 // PUT a person
-app.put('/api/persons/:id', (req, res) => {
-  const body = req.body
+app.put("/api/persons/:id", (req, res) => {
+  const { name, number } = req.body;
 
-  const person = {
-    name: body.name,
-    number: body.number
-  }
-
-  Person.findByIdAndUpdate(req.params.id, person, {new: true})
-    .then(updatedPerson => {
-      res.json(updatedPerson)
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
     })
-    .catch(error => next(error))
-})
+    .catch((error) => next(error));
+});
 
 // POST a new person
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   const personInfo = new Person({
@@ -77,27 +74,32 @@ app.post("/api/persons", (req, res) => {
     number: body.number,
   });
 
-  personInfo.save().then((savedPerson) => {
-    res.json(savedPerson);
-  });
+  personInfo
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 // ERROR HANDLERS
 const unknownEndPoint = (req, res) => {
-  res.status(404).end()
-}
-app.use(unknownEndPoint) // handler of requests with unknown endpoint
+  res.status(404).end();
+};
+app.use(unknownEndPoint); // handler of requests with unknown endpoint
 
 const errorHandler = (error, req, res, next) => {
-  console.error('Error:', error.message)
+  console.error("Error:", error.message);
 
-  if (error.name === 'CastError') {
-    res.status(404).send({error: "malformatted id"})
+  if (error.name === "CastError") {
+    return res.status(404).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return res.status(404).send({ error: error.message });
   }
 
-  next(error)
-}
-app.use(errorHandler) //handler of requests with unknown id
+  next(error);
+};
+app.use(errorHandler); //handler of requests with unknown id
 
 //start the server
 const PORT = process.env.PORT;

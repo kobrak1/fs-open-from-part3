@@ -41,7 +41,7 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 // DELETE the specified data
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     // eslint-disable-next-line no-unused-vars
     .then((result) => {
@@ -51,7 +51,7 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 // PUT a person
-app.put("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
   const { name, number } = req.body;
 
   Person.findByIdAndUpdate(
@@ -84,7 +84,7 @@ app.post("/api/persons", (req, res, next) => {
 
 // ERROR HANDLERS
 const unknownEndPoint = (req, res) => {
-  res.status(404).json({error: "this is a problem"}).end();
+  res.status(404).json({ error: "this is a problem" }).end();
 };
 app.use(unknownEndPoint); // handler of requests with unknown endpoint
 

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:ui": "rm -rf dist && cd ../ && npm run build && cp -r dist ../api",
-    "deploy:full": "npm run build:ui && git add . && git commit -m '3.21 Deploying the database backend to production' && git push",
+    "deploy:full": "npm run build:ui && git add . && git commit -m 'uibuild' && git push",
     "build": "npm i",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",

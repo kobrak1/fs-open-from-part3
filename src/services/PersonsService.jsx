@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // this is a relative url that helps to reach the ui content at the same address both backend and frontend
-const baseUrl = '/api/persons'
+const baseUrl = '/api/persons';
 
 const getAll = () => {
   return axios.get(baseUrl)

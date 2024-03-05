@@ -84,7 +84,7 @@ app.post("/api/persons", (req, res, next) => {
 
 // ERROR HANDLERS
 const unknownEndPoint = (req, res) => {
-  res.status(404).end();
+  res.status(404).json({error: "this is a problem"}).end();
 };
 app.use(unknownEndPoint); // handler of requests with unknown endpoint
 

@@ -23,6 +23,7 @@ const App = () => {
     PersonsService.getAll().then((response) => {
       console.log("promise fullfilled");
       setPersons(response.data);
+      console.log('people info are set')
     });
   }, []);
 
